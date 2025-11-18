@@ -471,57 +471,71 @@
     </div>
 
     <script>
-        // Expanded area code data with city/region information
+        // Expanded area code data with city/region information and NXX patterns
         const canadianAreaCodes = {
-            '236': { province: 'British Columbia', type: 'Overlay', introduced: '2013', cities: 'Vancouver, Victoria, Kelowna (overlay)' },
-            '250': { province: 'British Columbia', type: 'Geographic', introduced: '1996', cities: 'Victoria, Kelowna, Kamloops, Prince George' },
-            '604': { province: 'British Columbia', type: 'Geographic', introduced: '1947', cities: 'Vancouver, Burnaby, Surrey, Richmond' },
-            '672': { province: 'British Columbia', type: 'Overlay', introduced: '2016', cities: 'Vancouver, Victoria, Kelowna (overlay)' },
-            '778': { province: 'British Columbia', type: 'Overlay', introduced: '2001', cities: 'Vancouver, Victoria, Kelowna (overlay)' },
-            '368': { province: 'Alberta', type: 'Overlay', introduced: '2022', cities: 'Calgary, Edmonton (overlay)' },
-            '403': { province: 'Alberta', type: 'Geographic', introduced: '1947', cities: 'Calgary, Lethbridge, Red Deer, Medicine Hat' },
-            '587': { province: 'Alberta', type: 'Overlay', introduced: '2008', cities: 'Calgary, Edmonton (overlay)' },
-            '780': { province: 'Alberta', type: 'Geographic', introduced: '1997', cities: 'Edmonton, Grande Prairie, Fort McMurray' },
-            '825': { province: 'Alberta', type: 'Overlay', introduced: '2016', cities: 'Edmonton, Grande Prairie (overlay)' },
-            '306': { province: 'Saskatchewan', type: 'Geographic', introduced: '1947', cities: 'Regina, Saskatoon, Prince Albert, Moose Jaw' },
-            '639': { province: 'Saskatchewan', type: 'Overlay', introduced: '2012', cities: 'Regina, Saskatoon (overlay)' },
-            '474': { province: 'Saskatchewan', type: 'Overlay', introduced: '2024', cities: 'Regina, Saskatoon (overlay)' },
-            '204': { province: 'Manitoba', type: 'Geographic', introduced: '1947', cities: 'Winnipeg, Brandon, Steinbach, Thompson' },
-            '431': { province: 'Manitoba', type: 'Overlay', introduced: '2012', cities: 'Winnipeg, Brandon (overlay)' },
-            '226': { province: 'Ontario', type: 'Overlay', introduced: '2006', cities: 'London, Windsor, Kitchener (overlay)' },
-            '249': { province: 'Ontario', type: 'Overlay', introduced: '2011', cities: 'Sudbury, North Bay, Barrie (overlay)' },
-            '289': { province: 'Ontario', type: 'Overlay', introduced: '2001', cities: 'Hamilton, Burlington, Niagara (overlay)' },
-            '343': { province: 'Ontario', type: 'Overlay', introduced: '2010', cities: 'Ottawa, Kingston, Cornwall (overlay)' },
-            '365': { province: 'Ontario', type: 'Overlay', introduced: '2013', cities: 'Hamilton, Burlington (overlay)' },
-            '382': { province: 'Ontario', type: 'Overlay', introduced: '2023', cities: 'Sudbury, North Bay (overlay)' },
-            '416': { province: 'Ontario', type: 'Geographic', introduced: '1947', cities: 'Toronto (downtown and central)' },
-            '437': { province: 'Ontario', type: 'Overlay', introduced: '2013', cities: 'Toronto (overlay)' },
-            '519': { province: 'Ontario', type: 'Geographic', introduced: '1953', cities: 'London, Windsor, Kitchener, Cambridge' },
-            '548': { province: 'Ontario', type: 'Overlay', introduced: '2019', cities: 'London, Windsor, Kitchener (overlay)' },
-            '613': { province: 'Ontario', type: 'Geographic', introduced: '1947', cities: 'Ottawa, Kingston, Brockville, Cornwall' },
-            '647': { province: 'Ontario', type: 'Overlay', introduced: '2001', cities: 'Toronto (overlay)' },
-            '705': { province: 'Ontario', type: 'Geographic', introduced: '1957', cities: 'Sudbury, North Bay, Barrie, Peterborough' },
-            '742': { province: 'Ontario', type: 'Overlay', introduced: '2023', cities: 'Sudbury, North Bay (overlay)' },
-            '753': { province: 'Ontario', type: 'Overlay', introduced: '2023', cities: 'Ottawa, Kingston (overlay)' },
-            '807': { province: 'Ontario', type: 'Geographic', introduced: '1962', cities: 'Thunder Bay, Kenora, Dryden, Fort Frances' },
-            '905': { province: 'Ontario', type: 'Geographic', introduced: '1993', cities: 'Mississauga, Hamilton, Markham, Brampton' },
-            '354': { province: 'Quebec', type: 'Overlay', introduced: '2022', cities: 'Sherbrooke, Trois-Rivières (overlay)' },
-            '367': { province: 'Quebec', type: 'Overlay', introduced: '2023', cities: 'Laval, Laurentides (overlay)' },
-            '418': { province: 'Quebec', type: 'Geographic', introduced: '1947', cities: 'Quebec City, Lévis, Rimouski, Sept-Îles' },
-            '438': { province: 'Quebec', type: 'Overlay', introduced: '2006', cities: 'Montreal (overlay)' },
-            '450': { province: 'Quebec', type: 'Geographic', introduced: '1998', cities: 'Laval, Longueuil, Saint-Jean-sur-Richelieu' },
-            '468': { province: 'Quebec', type: 'Overlay', introduced: '2023', cities: 'Laval, Longueuil (overlay)' },
-            '514': { province: 'Quebec', type: 'Geographic', introduced: '1947', cities: 'Montreal (island)' },
-            '579': { province: 'Quebec', type: 'Overlay', introduced: '2010', cities: 'Sherbrooke, Trois-Rivières (overlay)' },
-            '581': { province: 'Quebec', type: 'Overlay', introduced: '2008', cities: 'Quebec City, Lévis (overlay)' },
-            '819': { province: 'Quebec', type: 'Geographic', introduced: '1957', cities: 'Gatineau, Sherbrooke, Trois-Rivières' },
-            '873': { province: 'Quebec', type: 'Overlay', introduced: '2017', cities: 'Gatineau, Sherbrooke (overlay)' },
-            '428': { province: 'New Brunswick', type: 'Overlay', introduced: '2014', cities: 'Moncton, Saint John, Fredericton (overlay)' },
-            '506': { province: 'New Brunswick', type: 'Geographic', introduced: '1955', cities: 'Moncton, Saint John, Fredericton, Bathurst' },
-            '782': { province: 'Nova Scotia / Prince Edward Island', type: 'Overlay', introduced: '2014', cities: 'Halifax, Sydney, Charlottetown (overlay)' },
-            '902': { province: 'Nova Scotia / Prince Edward Island', type: 'Geographic', introduced: '1947', cities: 'Halifax, Sydney, Dartmouth, Charlottetown' },
-            '709': { province: 'Newfoundland and Labrador', type: 'Geographic', introduced: '1962', cities: 'St. John\'s, Corner Brook, Mount Pearl, Labrador City' },
-            '867': { province: 'Yukon / Northwest Territories / Nunavut', type: 'Geographic', introduced: '1997', cities: 'Whitehorse, Yellowknife, Iqaluit' },
+            '236': { province: 'British Columbia', type: 'Overlay', introduced: '2013', cities: 'Vancouver, Victoria, Kelowna, Nanaimo', mainCities: ['Vancouver', 'Victoria', 'Kelowna'] },
+            '250': { province: 'British Columbia', type: 'Geographic', introduced: '1996', cities: 'Victoria, Kelowna, Kamloops, Prince George, Nanaimo, Courtenay', mainCities: ['Victoria', 'Kelowna', 'Kamloops', 'Prince George'] },
+            '604': { province: 'British Columbia', type: 'Geographic', introduced: '1947', cities: 'Vancouver, Burnaby, Surrey, Richmond, New Westminster, North Vancouver', mainCities: ['Vancouver', 'Burnaby', 'Surrey', 'Richmond'] },
+            '672': { province: 'British Columbia', type: 'Overlay', introduced: '2016', cities: 'Vancouver, Victoria, Kelowna, Nanaimo', mainCities: ['Vancouver', 'Victoria', 'Kelowna'] },
+            '778': { province: 'British Columbia', type: 'Overlay', introduced: '2001', cities: 'Vancouver, Victoria, Kelowna, Surrey, Burnaby', mainCities: ['Vancouver', 'Victoria', 'Kelowna'] },
+            '368': { province: 'Alberta', type: 'Overlay', introduced: '2022', cities: 'Calgary, Edmonton, Red Deer', mainCities: ['Calgary', 'Edmonton'] },
+            '403': { province: 'Alberta', type: 'Geographic', introduced: '1947', cities: 'Calgary, Lethbridge, Red Deer, Medicine Hat, Airdrie', mainCities: ['Calgary', 'Lethbridge', 'Red Deer'] },
+            '587': { province: 'Alberta', type: 'Overlay', introduced: '2008', cities: 'Calgary, Edmonton, Red Deer', mainCities: ['Calgary', 'Edmonton'] },
+            '780': { province: 'Alberta', type: 'Geographic', introduced: '1997', cities: 'Edmonton, Grande Prairie, Fort McMurray, Lloydminster', mainCities: ['Edmonton', 'Grande Prairie', 'Fort McMurray'] },
+            '825': { province: 'Alberta', type: 'Overlay', introduced: '2016', cities: 'Edmonton, Grande Prairie, Fort McMurray', mainCities: ['Edmonton', 'Grande Prairie'] },
+            '306': { province: 'Saskatchewan', type: 'Geographic', introduced: '1947', cities: 'Regina, Saskatoon, Prince Albert, Moose Jaw, Swift Current', mainCities: ['Regina', 'Saskatoon', 'Prince Albert'] },
+            '639': { province: 'Saskatchewan', type: 'Overlay', introduced: '2012', cities: 'Regina, Saskatoon, Prince Albert, Moose Jaw', mainCities: ['Regina', 'Saskatoon'] },
+            '474': { province: 'Saskatchewan', type: 'Overlay', introduced: '2024', cities: 'Regina, Saskatoon, Prince Albert', mainCities: ['Regina', 'Saskatoon'] },
+            '204': { province: 'Manitoba', type: 'Geographic', introduced: '1947', cities: 'Winnipeg, Brandon, Steinbach, Thompson, Portage la Prairie', mainCities: ['Winnipeg', 'Brandon', 'Steinbach'] },
+            '431': { province: 'Manitoba', type: 'Overlay', introduced: '2012', cities: 'Winnipeg, Brandon, Steinbach, Thompson', mainCities: ['Winnipeg', 'Brandon'] },
+            '226': { province: 'Ontario', type: 'Overlay', introduced: '2006', cities: 'London, Windsor, Kitchener, Waterloo, Cambridge, Sarnia', mainCities: ['London', 'Windsor', 'Kitchener'] },
+            '249': { province: 'Ontario', type: 'Overlay', introduced: '2011', cities: 'Sudbury, North Bay, Barrie, Orillia, Parry Sound', mainCities: ['Sudbury', 'North Bay', 'Barrie'] },
+            '289': { province: 'Ontario', type: 'Overlay', introduced: '2001', cities: 'Hamilton, Burlington, Niagara Falls, St. Catharines, Grimsby', mainCities: ['Hamilton', 'Burlington', 'Niagara Falls'] },
+            '343': { province: 'Ontario', type: 'Overlay', introduced: '2010', cities: 'Ottawa, Kingston, Cornwall, Pembroke, Brockville', mainCities: ['Ottawa', 'Kingston', 'Cornwall'] },
+            '365': { province: 'Ontario', type: 'Overlay', introduced: '2013', cities: 'Hamilton, Burlington, Niagara Falls, St. Catharines', mainCities: ['Hamilton', 'Burlington'] },
+            '382': { province: 'Ontario', type: 'Overlay', introduced: '2023', cities: 'Sudbury, North Bay, Parry Sound', mainCities: ['Sudbury', 'North Bay'] },
+            '416': { province: 'Ontario', type: 'Geographic', introduced: '1947', cities: 'Toronto (downtown and central areas)', mainCities: ['Toronto'] },
+            '437': { province: 'Ontario', type: 'Overlay', introduced: '2013', cities: 'Toronto (all areas)', mainCities: ['Toronto'] },
+            '519': { province: 'Ontario', type: 'Geographic', introduced: '1953', cities: 'London, Windsor, Kitchener, Cambridge, Guelph, Stratford', mainCities: ['London', 'Windsor', 'Kitchener', 'Cambridge'] },
+            '548': { province: 'Ontario', type: 'Overlay', introduced: '2019', cities: 'London, Windsor, Kitchener, Cambridge, Guelph', mainCities: ['London', 'Windsor', 'Kitchener'] },
+            '613': { province: 'Ontario', type: 'Geographic', introduced: '1947', cities: 'Ottawa, Kingston, Brockville, Cornwall, Pembroke, Belleville', mainCities: ['Ottawa', 'Kingston', 'Brockville'] },
+            '647': { province: 'Ontario', type: 'Overlay', introduced: '2001', cities: 'Toronto (all areas)', mainCities: ['Toronto'] },
+            '705': { province: 'Ontario', type: 'Geographic', introduced: '1957', cities: 'Sudbury, North Bay, Barrie, Peterborough, Orillia', mainCities: ['Sudbury', 'North Bay', 'Barrie', 'Peterborough'] },
+            '742': { province: 'Ontario', type: 'Overlay', introduced: '2023', cities: 'Sudbury, North Bay, Parry Sound', mainCities: ['Sudbury', 'North Bay'] },
+            '753': { province: 'Ontario', type: 'Overlay', introduced: '2023', cities: 'Ottawa, Kingston, Cornwall, Brockville', mainCities: ['Ottawa', 'Kingston'] },
+            '807': { province: 'Ontario', type: 'Geographic', introduced: '1962', cities: 'Thunder Bay, Kenora, Dryden, Fort Frances, Sioux Lookout', mainCities: ['Thunder Bay', 'Kenora', 'Dryden'] },
+            '905': { province: 'Ontario', type: 'Geographic', introduced: '1993', cities: 'Mississauga, Hamilton, Markham, Brampton, Vaughan, Oakville', mainCities: ['Mississauga', 'Hamilton', 'Markham', 'Brampton'] },
+            '354': { province: 'Quebec', type: 'Overlay', introduced: '2022', cities: 'Sherbrooke, Trois-Rivières, Drummondville', mainCities: ['Sherbrooke', 'Trois-Rivières'] },
+            '367': { province: 'Quebec', type: 'Overlay', introduced: '2023', cities: 'Laval, Saint-Jérôme, Mont-Tremblant', mainCities: ['Laval', 'Saint-Jérôme'] },
+            '418': { province: 'Quebec', type: 'Geographic', introduced: '1947', cities: 'Quebec City, Lévis, Rimouski, Sept-Îles, Saguenay', mainCities: ['Quebec City', 'Lévis', 'Rimouski'] },
+            '438': { province: 'Quebec', type: 'Overlay', introduced: '2006', cities: 'Montreal (island and surrounding areas)', mainCities: ['Montreal'] },
+            '450': { province: 'Quebec', type: 'Geographic', introduced: '1998', cities: 'Laval, Longueuil, Saint-Jean-sur-Richelieu, Saint-Jérôme, Joliette', mainCities: ['Laval', 'Longueuil', 'Saint-Jean-sur-Richelieu'] },
+            '468': { province: 'Quebec', type: 'Overlay', introduced: '2023', cities: 'Laval, Longueuil, Saint-Jean-sur-Richelieu', mainCities: ['Laval', 'Longueuil'] },
+            '514': { province: 'Quebec', type: 'Geographic', introduced: '1947', cities: 'Montreal (island of Montreal)', mainCities: ['Montreal'] },
+            '579': { province: 'Quebec', type: 'Overlay', introduced: '2010', cities: 'Sherbrooke, Trois-Rivières, Drummondville', mainCities: ['Sherbrooke', 'Trois-Rivières'] },
+            '581': { province: 'Quebec', type: 'Overlay', introduced: '2008', cities: 'Quebec City, Lévis, Rimouski, Saguenay', mainCities: ['Quebec City', 'Lévis'] },
+            '819': { province: 'Quebec', type: 'Geographic', introduced: '1957', cities: 'Gatineau, Sherbrooke, Trois-Rivières, Drummondville, Granby', mainCities: ['Gatineau', 'Sherbrooke', 'Trois-Rivières'] },
+            '873': { province: 'Quebec', type: 'Overlay', introduced: '2017', cities: 'Gatineau, Sherbrooke, Trois-Rivières, Drummondville', mainCities: ['Gatineau', 'Sherbrooke'] },
+            '428': { province: 'New Brunswick', type: 'Overlay', introduced: '2014', cities: 'Moncton, Saint John, Fredericton, Bathurst, Miramichi', mainCities: ['Moncton', 'Saint John', 'Fredericton'] },
+            '506': { province: 'New Brunswick', type: 'Geographic', introduced: '1955', cities: 'Moncton, Saint John, Fredericton, Bathurst, Miramichi', mainCities: ['Moncton', 'Saint John', 'Fredericton'] },
+            '782': { province: 'Nova Scotia / Prince Edward Island', type: 'Overlay', introduced: '2014', cities: 'Halifax, Sydney, Dartmouth, Charlottetown, Summerside', mainCities: ['Halifax', 'Sydney', 'Charlottetown'] },
+            '902': { province: 'Nova Scotia / Prince Edward Island', type: 'Geographic', introduced: '1947', cities: 'Halifax, Sydney, Dartmouth, Charlottetown, Summerside, Truro', mainCities: ['Halifax', 'Sydney', 'Dartmouth', 'Charlottetown'] },
+            '709': { province: 'Newfoundland and Labrador', type: 'Geographic', introduced: '1962', cities: 'St. John\'s, Corner Brook, Mount Pearl, Labrador City, Gander', mainCities: ['St. John\'s', 'Corner Brook', 'Mount Pearl'] },
+            '867': { province: 'Yukon / Northwest Territories / Nunavut', type: 'Geographic', introduced: '1997', cities: 'Whitehorse, Yellowknife, Iqaluit, Inuvik, Dawson City', mainCities: ['Whitehorse', 'Yellowknife', 'Iqaluit'] },
+        };
+
+        // Common original carriers by province (historical data)
+        const originalCarriers = {
+            'British Columbia': 'BC Tel (now Telus)',
+            'Alberta': 'AGT/Telus',
+            'Saskatchewan': 'SaskTel',
+            'Manitoba': 'Manitoba Telecom Services (MTS, now Bell MTS)',
+            'Ontario': 'Bell Canada',
+            'Quebec': 'Bell Canada',
+            'New Brunswick': 'NBTel (now Bell Aliant)',
+            'Nova Scotia / Prince Edward Island': 'Maritime Tel & Tel (now Bell Aliant)',
+            'Newfoundland and Labrador': 'NewTel (now Bell Aliant)',
+            'Yukon / Northwest Territories / Nunavut': 'Northwestel (Telus subsidiary)'
         };
 
         function formatPhoneNumber(value) {
@@ -636,6 +650,7 @@
                 lineNumber: lineNumber || 'Not provided',
                 province: areaCodeInfo.province,
                 cities: areaCodeInfo.cities,
+                mainCities: areaCodeInfo.mainCities,
                 areaCodeType: areaCodeInfo.type,
                 introduced: areaCodeInfo.introduced,
                 numberType: numberTypeInfo.type,
@@ -644,7 +659,8 @@
                 isComplete: phoneDigits.length === 10,
                 additionalInfo: additionalInfo,
                 country: 'Canada',
-                countryCode: '+1'
+                countryCode: '+1',
+                originalCarrier: originalCarriers[areaCodeInfo.province] || 'Unknown'
             };
 
             displayResult(result);
@@ -705,12 +721,13 @@
                                 i
                                 <div class="tooltip">
                                     <strong>Location Information:</strong>
-                                    Based on the area code (NPA), we can determine the province and general region. The cities listed represent common service areas for this area code.
+                                    Based on the area code (NPA), we can determine the province and general region. The cities listed represent common service areas for this area code. Note: With number portability, the actual location may vary.
                                 </div>
                             </span>
                         </div>
                         <div class="info-value-large">${result.province}</div>
-                        <div class="info-value-small">Cities: ${result.cities}</div>
+                        <div class="info-value-small">Main Cities: ${result.mainCities.join(', ')}</div>
+                        <div class="info-value-small" style="margin-top: 8px;">All Coverage Areas: ${result.cities}</div>
                     </div>
 
                     <div class="info-box">
@@ -777,7 +794,17 @@
                 ${additionalInfoHTML}
 
                 <div class="info-box">
-                    <h3 style="margin-bottom: 12px;">Technical Details</h3>
+                    <h3 style="margin-bottom: 12px;">Technical Details
+                        <span class="info-icon">
+                            i
+                            <div class="tooltip">
+                                <strong>Technical Information:</strong>
+                                <div class="tooltip-item"><strong>Original Carrier:</strong> Historical incumbent provider that originally served this region</div>
+                                <div class="tooltip-item"><strong>NANP:</strong> North American Numbering Plan - shared by US, Canada, and Caribbean</div>
+                                <div class="tooltip-item">Note: Due to number portability, current carrier may differ from original</div>
+                            </div>
+                        </span>
+                    </h3>
                     <div class="grid grid-4">
                         <div>
                             <div class="info-label">Country</div>
@@ -795,6 +822,11 @@
                             <div class="info-label">Format</div>
                             <div class="info-value">NANP</div>
                         </div>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                        <div class="info-label">Original Carrier (Historical)</div>
+                        <div class="info-value">${result.originalCarrier}</div>
+                        <div class="type-description" style="margin-top: 4px;">This was the incumbent telephone company that originally served this region. Due to deregulation and number portability, the current service provider may be different.</div>
                     </div>
                 </div>
             `;
