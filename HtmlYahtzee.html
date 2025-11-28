@@ -351,7 +351,8 @@
             held: [false, false, false, false, false],
             rollsLeft: 3,
             scores: {},
-            currentTurn: 1
+            currentTurn: 1,
+            yahtzeeBonus: 0
         };
 
         function getDiceDots(value) {
@@ -469,9 +470,31 @@
         }
 
         function scoreCategory(category) {
-            if (gameState.scores[category] !== undefined || gameState.rollsLeft === 3) return;
+            if (gameState.rollsLeft === 3) return;
             
-            gameState.scores[category] = calculateScore(category);
+            // Special handling for Yahtzee bonuses
+            const isYahtzee = Object.values(gameState.dice.reduce((acc, d) => {
+                acc[d] = (acc[d] || 0) + 1;
+                return acc;
+            }, {})).some(c => c === 5);
+            
+            if (category === 'yahtzee') {
+                if (gameState.scores[category] !== undefined) return; // Can't reuse the main Yahtzee slot
+                gameState.scores[category] = calculateScore(category);
+            } else if (isYahtzee && gameState.scores['yahtzee'] !== undefined && gameState.scores['yahtzee'] > 0) {
+                // This is a bonus Yahtzee! Award 100 points
+                if (gameState.scores[category] === undefined) {
+                    gameState.scores[category] = calculateScore(category);
+                    gameState.yahtzeeBonus += 100;
+                    alert('🎉 YAHTZEE BONUS! +100 points! 🎉');
+                } else {
+                    return; // Category already used
+                }
+            } else {
+                if (gameState.scores[category] !== undefined) return; // Category already used
+                gameState.scores[category] = calculateScore(category);
+            }
+            
             gameState.rollsLeft = 3;
             gameState.held = [false, false, false, false, false];
             gameState.dice = [0, 0, 0, 0, 0];
@@ -583,13 +606,27 @@
             board.appendChild(upperSection);
             board.appendChild(lowerSection);
             
+            // Yahtzee Bonus display
+            if (gameState.yahtzeeBonus > 0) {
+                const bonusSection = document.createElement('div');
+                bonusSection.className = 'score-row';
+                bonusSection.style.gridColumn = '1 / -1';
+                bonusSection.style.background = '#ffeb3b';
+                bonusSection.style.fontWeight = 'bold';
+                bonusSection.innerHTML = `
+                    <div class="score-name">🎉 Yahtzee Bonus</div>
+                    <div class="score-value">${gameState.yahtzeeBonus}</div>
+                `;
+                board.appendChild(bonusSection);
+            }
+            
             // Total score row
             const totalRow = document.createElement('div');
             totalRow.className = 'score-row total-row';
             totalRow.style.gridColumn = '1 / -1';
             totalRow.innerHTML = `
                 <div class="score-name">TOTAL SCORE</div>
-                <div class="score-value">${upperTotal + lowerTotal + bonus}</div>
+                <div class="score-value">${upperTotal + lowerTotal + bonus + gameState.yahtzeeBonus}</div>
             `;
             board.appendChild(totalRow);
         }
@@ -604,7 +641,7 @@
                 .reduce((sum, k) => sum + gameState.scores[k], 0);
             
             const bonus = upperTotal >= 63 ? 35 : 0;
-            const finalScore = upperTotal + lowerTotal + bonus;
+            const finalScore = upperTotal + lowerTotal + bonus + gameState.yahtzeeBonus;
             
             alert(`Game Over! Final Score: ${finalScore}`);
             document.getElementById('info').textContent = `Game Over! Final Score: ${finalScore}`;
@@ -616,7 +653,8 @@
                 held: [false, false, false, false, false],
                 rollsLeft: 3,
                 scores: {},
-                currentTurn: 1
+                currentTurn: 1,
+                yahtzeeBonus: 0
             };
             initGame();
         }
