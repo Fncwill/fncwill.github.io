@@ -77,6 +77,15 @@
             color: #666;
         }
         
+        .score-row.used.yahtzee-clickable {
+            cursor: pointer;
+        }
+        
+        .score-row.used.yahtzee-clickable:hover {
+            background: #d0d0d0;
+            transform: translateX(2px);
+        }
+        
         .score-row.total-row {
             font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -309,8 +318,6 @@
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
-        
-
     </style>
 </head>
 <body>
@@ -352,6 +359,7 @@
             rollsLeft: 3,
             scores: {},
             currentTurn: 1,
+            yahtzeeCount: 0,
             yahtzeeBonus: 0
         };
 
@@ -472,41 +480,54 @@
         function scoreCategory(category) {
             if (gameState.rollsLeft === 3) return;
             
-            // Special handling for Yahtzee bonuses
-            const isYahtzee = Object.values(gameState.dice.reduce((acc, d) => {
-                acc[d] = (acc[d] || 0) + 1;
-                return acc;
-            }, {})).some(c => c === 5);
+            // Check if current dice is a Yahtzee
+            const counts = {};
+            gameState.dice.forEach(d => counts[d] = (counts[d] || 0) + 1);
+            const isYahtzee = Object.values(counts).some(c => c === 5);
             
+            // Special handling for Yahtzee category
             if (category === 'yahtzee') {
-                if (gameState.scores[category] !== undefined) return; // Can't reuse the main Yahtzee slot
-                gameState.scores[category] = calculateScore(category);
-            } else if (isYahtzee && gameState.scores['yahtzee'] !== undefined && gameState.scores['yahtzee'] > 0) {
-                // This is a bonus Yahtzee! Award 100 points
-                if (gameState.scores[category] === undefined) {
-                    gameState.scores[category] = calculateScore(category);
-                    gameState.yahtzeeBonus += 100;
-                    alert('🎉 YAHTZEE BONUS! +100 points! 🎉');
+                if (!isYahtzee) {
+                    // Trying to score Yahtzee without having one
+                    if (gameState.scores[category] === undefined) {
+                        gameState.scores[category] = 0;
+                    } else {
+                        return; // Already scored, can't score again
+                    }
                 } else {
-                    return; // Category already used
+                    // Have a Yahtzee!
+                    if (gameState.scores[category] === undefined) {
+                        // First Yahtzee
+                        gameState.scores[category] = 50;
+                        gameState.yahtzeeCount = 1;
+                    } else {
+                        // Bonus Yahtzee!
+                        gameState.yahtzeeCount++;
+                        gameState.yahtzeeBonus += 100;
+                        alert(`🎉 YAHTZEE BONUS! x${gameState.yahtzeeCount}! +100 points! 🎉`);
+                    }
                 }
             } else {
+                // Regular category scoring
                 if (gameState.scores[category] !== undefined) return; // Category already used
                 gameState.scores[category] = calculateScore(category);
+            }
+            
+            // Only advance turn if not a bonus Yahtzee
+            if (category !== 'yahtzee' || gameState.yahtzeeCount <= 1) {
+                gameState.currentTurn++;
             }
             
             gameState.rollsLeft = 3;
             gameState.held = [false, false, false, false, false];
             gameState.dice = [0, 0, 0, 0, 0];
-            gameState.currentTurn++;
             
             updateDiceDisplay();
             updateInfo();
             renderScoreboard();
             
-            // Check if all 13 categories are filled
+            // Check if all 13 categories are filled (bonus Yahtzees don't count as turns)
             const scoredCategories = Object.keys(gameState.scores).length;
-            console.log('Scored categories:', scoredCategories);
             
             if (scoredCategories === 13) {
                 setTimeout(() => {
@@ -586,6 +607,11 @@
                 name.className = 'score-name';
                 name.textContent = categories[key].name;
                 
+                // Add Yahtzee multiplier if applicable
+                if (key === 'yahtzee' && gameState.yahtzeeCount > 1) {
+                    name.textContent += ` (x${gameState.yahtzeeCount})`;
+                }
+                
                 const value = document.createElement('div');
                 value.className = 'score-value';
                 
@@ -599,7 +625,17 @@
                 
                 row.appendChild(name);
                 row.appendChild(value);
-                row.onclick = () => scoreCategory(key);
+                
+                // Allow clicking Yahtzee again for bonus Yahtzees
+                if (key === 'yahtzee') {
+                    row.onclick = () => scoreCategory(key);
+                    if (gameState.scores[key] !== undefined) {
+                        row.classList.add('yahtzee-clickable');
+                    }
+                } else if (gameState.scores[key] === undefined) {
+                    row.onclick = () => scoreCategory(key);
+                }
+                
                 lowerSection.appendChild(row);
             });
             
@@ -654,6 +690,7 @@
                 rollsLeft: 3,
                 scores: {},
                 currentTurn: 1,
+                yahtzeeCount: 0,
                 yahtzeeBonus: 0
             };
             initGame();
