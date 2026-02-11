@@ -1,9 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Teko:wght@300;400;500;600;700&family=Audiowide&family=Black+Ops+One&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<a href= "https://fncwill.github.io/canadian_phone_html"> Canadian Phone Lookup </a> <br>
-<a href= "https://fncwill.github.io/HtmlYahtzee.html"> HTML Yahtzee</a> <br>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background-color: #2a2a2a;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Perforated metal texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at center, transparent 2px, #2a2a2a 2px),
+                linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #3a3a3a 100%);
+            background-size: 8px 8px, 100% 100%;
+            background-position: 0 0, 0 0;
+            z-index: -1;
+        }
+
+        /* Additional metallic overlay for depth */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at top, rgba(70, 70, 70, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.3) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Logo placeholder */
+        .logo-container {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #353535, #1f1f1f);
+            border-radius: 50%;
+            box-shadow: 
+                inset 0 4px 8px rgba(0, 0, 0, 0.6),
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(100, 149, 237, 0.2);
+            border: 3px solid #404040;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 1.5px, rgba(0, 0, 0, 0.1) 1.5px);
+            background-size: 6px 6px;
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 2;
+        }
+
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-placeholder {
+            color: #666;
+            font-size: 0.75rem;
+            text-align: center;
+            padding: 1rem;
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+            z-index: 1;
+        }
+
+        /* Button grid container */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        /* Navigation buttons */
+        .nav-button {
+            background: linear-gradient(145deg, #3a3a3a, #252525);
+            border: none;
+            padding: 3rem 2rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Black Ops One', cursive;
+            color: #c0c0c0;
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border: 2px solid #404040;
+            text-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(100, 149, 237, 0.3);
+        }
+
+        /* Perforated texture on buttons */
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 1.5px, rgba(0, 0, 0, 0.1) 1.5px);
+            background-size: 6px 6px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 0 30px rgba(100, 149, 237, 0.5),
+                0 0 60px rgba(100, 149, 237, 0.3);
+            border-color: #6495ED;
+            color: #ffffff;
+            background: linear-gradient(145deg, #454545, #2f2f2f);
+            text-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(100, 149, 237, 0.8),
+                0 0 30px rgba(100, 149, 237, 0.5);
+        }
+
+        .nav-button:active {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.5),
+                inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive design */
+        @media (max-width: 900px) {
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+
+            .nav-button {
+                padding: 2.5rem 1.5rem;
+                font-size: 1.3rem;
+                letter-spacing: 2px;
+            }
+
+            .logo-container {
+                width: 150px;
+                height: 150px;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo placeholder -->
+    <div class="logo-container">
+        <img src="logo.jpg" alt="Logo" class="logo-image">
+    </div>
+
+    <!-- Button grid -->
+    <div class="button-grid">
+        <button class="nav-button" onclick="location.href='#coding'">
+            Coding Projects
+        </button>
+        <button class="nav-button" onclick="location.href='#poetry'">
+            Poetry
+        </button>
+        <button class="nav-button" onclick="location.href='#resume'">
+            Resume
+        </button>
+    </div>
+
+    <script>
+        // Add click handlers for the buttons
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', function() {
+                console.log('Navigating to:', this.textContent.trim());
+                // Add your navigation logic here
+            });
+        });
+    </script>
 </body>
-</html>
-                                
+</html>             
