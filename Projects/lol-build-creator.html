@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Creator</title>
+<style>
+:root{--bg:#f5f5f7;--card:#fff;--tx:#1c1c1e;--mu:#7a7a85;--bd:#e3e3e8;--ac:#c89b3c;--ac2:#0a7;}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1015;--card:#171a21;--tx:#eceef2;--mu:#8b91a0;--bd:#262b36;}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:20px}
+h1{font-size:20px;margin:0 0 16px}h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+input,select,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:7px 10px}
+button{cursor:pointer}button:hover{border-color:var(--ac)}button.pri{background:var(--ac);border-color:var(--ac);color:#111;font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grow{flex:1;min-width:140px}
+img{display:block}.ic{width:44px;height:44px;border-radius:8px;border:2px solid transparent;background:var(--bg);cursor:pointer}
+.ic.sm{width:36px;height:36px}.ic.on{border-color:var(--ac)}.ic.off{opacity:.35;filter:grayscale(1)}
+.ic:hover{border-color:var(--mu)}.ic.on:hover{border-color:var(--ac)}
+.champ{display:flex;gap:14px;align-items:center}.champ img{width:64px;height:64px;border-radius:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;max-height:260px;overflow:auto;margin-top:10px}
+.skills{overflow-x:auto}.sk{display:grid;grid-template-columns:44px repeat(18,minmax(28px,1fr));gap:4px;min-width:640px;align-items:center}
+.sk .h{text-align:center;color:var(--mu);font-size:11px}
+.cell{height:28px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);cursor:pointer;font-size:11px;color:var(--bg)}
+.cell.on{background:var(--ac);border-color:var(--ac);color:#111;font-weight:700}.cell.dis{opacity:.3;cursor:not-allowed}
+.sk img{width:36px;height:36px;border-radius:6px}
+.tag{font-size:12px;color:var(--mu)}
+.runes{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:700px){.runes{grid-template-columns:1fr}}
+.rrow{display:flex;gap:6px;margin:8px 0}.trees{display:flex;gap:6px;margin-bottom:6px}
+.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.slot{aspect-ratio:1;border:1px dashed var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative}
+.slot img{width:100%;height:100%}.slot span{color:var(--mu);font-size:11px}.slot.act{border-color:var(--ac)}
+.x{position:absolute;top:2px;right:2px;background:#000a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:11px;text-align:center;line-height:16px}
+.saves{display:flex;flex-direction:column;gap:6px}.sv{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border:1px solid var(--bd);border-radius:8px}
+.sv img{width:28px;height:28px;border-radius:6px;display:inline-block;vertical-align:middle;margin-right:8px}
+#msg{padding:40px;text-align:center;color:var(--mu)}
+</style></head><body><div class="wrap">
+<h1>Build Creator</h1>
+<div id="app"><div id="msg">Loading game data…</div></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='lol-builds-v1';
+let V,CH={},ITEMS=[],TREES=[],D=null; // D = detailed current champion
+let S=blank(),picker=null,champQ='',itemQ='',mapF='all',slotIdx=0;
+function blank(){return{name:'',champ:null,skills:Array(18).fill(null),pri:null,ks:null,p:[null,null,null],sec:null,s:[],items:Array(6).fill(null)}}
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||[]}catch{return[]}};
+const store=a=>{try{localStorage.setItem(KEY,JSON.stringify(a))}catch{alert('Could not save (storage unavailable).')}};
+const CD='https://ddragon.leagueoflegends.com/';
+async function init(){
+  try{
+    V=(await (await fetch(CD+'api/versions.json')).json())[0];
+    const [c,i,r]=await Promise.all([
+      fetch(`${CD}cdn/${V}/data/en_US/champion.json`).then(r=>r.json()),
+      fetch(`${CD}cdn/${V}/data/en_US/item.json`).then(r=>r.json()),
+      fetch(`${CD}cdn/${V}/data/en_US/runesReforged.json`).then(r=>r.json())]);
+    CH=c.data;TREES=r;
+    const seen=new Set();
+    ITEMS=Object.entries(i.data).map(([id,x])=>({id,...x})).filter(x=>x.gold&&x.gold.purchasable&&x.gold.total>0&&!seen.has(x.name)&&seen.add(x.name))
+      .sort((a,b)=>b.gold.total-a.gold.total);
+    render();
+  }catch(e){$('#app').innerHTML='<div id="msg">Could not load data from Riot’s Data Dragon. Open this file directly in your browser with an internet connection.</div>'}
+}
+async function pickChamp(id){
+  S.champ=id;S.skills=Array(18).fill(null);D=null;render();
+  D=(await (await fetch(`${CD}cdn/${V}/data/en_US/champion/${id}.json`)).json()).data[id];render();
+}
+const KEYS=['Q','W','E','R'];
+const rank=(k,upTo=18)=>S.skills.slice(0,upTo).filter(x=>x===k).length;
+function setSkill(lv,k){
+  if(S.skills[lv]===k){S.skills[lv]=null;return render()}
+  const ult=k==='R',L=lv+1;
+  if(ult&&![6,11,16].includes(L))return;
+  if(!ult&&rank(k)>=5&&S.skills[lv]!==k)return;
+  if(ult&&rank(k)>=3)return;
+  if(ult?false:false){}
+  S.skills[lv]=k;render();
+}
+function canSet(lv,k){
+  const L=lv+1;if(S.skills[lv]===k)return true;
+  if(k==='R')return [6,11,16].includes(L)&&rank('R')<3;
+  if(rank(k)>=5)return false;
+  // basic ability rank n needs level >= 2n-1
+  return L>=2*(rank(k,lv)+1)-1;
+}
+function tree(id){return TREES.find(t=>t.id===id)}
+function runeById(id){for(const t of TREES)for(const sl of t.slots)for(const r of sl.runes)if(r.id===id)return r}
+const rimg=r=>`https://ddragon.leagueoflegends.com/cdn/img/${r.icon}`;
+function setPri(id){S.pri=id;S.ks=null;S.p=[null,null,null];if(S.sec===id){S.sec=null;S.s=[]}render()}
+function setSec(id){S.sec=id;S.s=[];render()}
+function pickSec(rowI,r){
+  // S.s holds {row,id}
+  S.s=S.s.filter(x=>x.row!==rowI);
+  if(S.s.some(x=>x.id===r.id))return render();
+  S.s.push({row:rowI,id:r.id});if(S.s.length>2)S.s.shift();render();
+}
+function render(){
+  const saves=load();
+  const c=S.champ?CH[S.champ]:null;
+  let h=`<div class="card"><div class="row"><input class="grow" id="name" placeholder="Build name" value="${esc(S.name)}">
+   <button class="pri" id="save">Save build</button><button id="new">New</button></div>
+   ${saves.length?`<div class="saves" style="margin-top:12px">${saves.map((b,i)=>`<div class="sv"><span>${b.champ&&CH[b.champ]?`<img src="${CD}cdn/${V}/img/champion/${b.champ}.png">`:''}${esc(b.name||'Untitled')} <span class="tag">${b.champ?esc(CH[b.champ]?.name||b.champ):''}</span></span><span class="row"><button data-load="${i}">Load</button><button data-del="${i}">Delete</button></span></div>`).join('')}</div>`:''}</div>`;
+  // champion
+  h+=`<div class="card"><h2>Champion</h2>`;
+  if(c)h+=`<div class="champ"><img src="${CD}cdn/${V}/img/champion/${c.id}.png"><div><b style="font-size:18px">${esc(c.name)}</b><div class="tag">${esc(c.title)}</div></div><button id="chg" style="margin-left:auto">${picker==='champ'?'Close':'Change'}</button></div>`;
+  else h+=`<button id="chg" class="pri">Choose champion</button>`;
+  if(picker==='champ'||!c){h+=`<input id="cq" placeholder="Search champions" value="${esc(champQ)}" style="margin-top:10px;width:100%"><div class="grid">`+
+    Object.values(CH).filter(x=>x.name.toLowerCase().includes(champQ.toLowerCase())).map(x=>`<img class="ic" title="${esc(x.name)}" data-champ="${x.id}" src="${CD}cdn/${V}/img/champion/${x.id}.png">`).join('')+`</div>`}
+  h+=`</div>`;
+  // skills
+  h+=`<div class="card skills"><h2>Skill order</h2>`;
+  if(!D)h+=`<div class="tag">Pick a champion to set skills.</div>`;
+  else{
+    h+=`<div class="sk"><div></div>${Array.from({length:18},(_,i)=>`<div class="h">${i+1}</div>`).join('')}`;
+    KEYS.forEach((k,ki)=>{
+      h+=`<img title="${esc(D.spells[ki].name)}" src="${CD}cdn/${V}/img/spell/${D.spells[ki].image.full}">`;
+      for(let i=0;i<18;i++){const on=S.skills[i]===k,ok=canSet(i,k);
+        h+=`<button class="cell ${on?'on':''} ${ok?'':'dis'}" data-sk="${i},${k}">${on?k:''}</button>`}
+    });
+    h+=`</div><div class="tag" style="margin-top:8px">Max order: ${['Q','W','E'].map(k=>`${k} ${rank(k)}/5`).join(' · ')} · R ${rank('R')}/3</div>`;
+  }
+  h+=`</div>`;
+  // runes
+  const pt=tree(S.pri),st=tree(S.sec);
+  h+=`<div class="card"><h2>Runes</h2><div class="runes"><div><div class="tag">Primary</div><div class="trees">${TREES.map(t=>`<img class="ic sm ${S.pri===t.id?'on':'off'}" title="${esc(t.name)}" data-pri="${t.id}" src="${rimg(t)}">`).join('')}</div>`;
+  if(pt)pt.slots.forEach((sl,si)=>{h+=`<div class="rrow">${sl.runes.map(r=>{
+      const on=si===0?S.ks===r.id:S.p[si-1]===r.id;
+      return `<img class="ic ${si===0?'':'sm'} ${on?'on':'off'}" title="${esc(r.name)}" data-pr="${si},${r.id}" src="${rimg(r)}">`}).join('')}</div>`});
+  h+=`</div><div><div class="tag">Secondary</div><div class="trees">${TREES.filter(t=>t.id!==S.pri).map(t=>`<img class="ic sm ${S.sec===t.id?'on':'off'}" title="${esc(t.name)}" data-sec="${t.id}" src="${rimg(t)}">`).join('')}</div>`;
+  if(st)st.slots.forEach((sl,si)=>{if(si===0)return;h+=`<div class="rrow">${sl.runes.map(r=>`<img class="ic sm ${S.s.some(x=>x.id===r.id)?'on':'off'}" title="${esc(r.name)}" data-sr="${si},${r.id}" src="${rimg(r)}">`).join('')}</div>`});
+  h+=`<div class="tag">Pick any 2 from different rows</div></div></div></div>`;
+  // items
+  h+=`<div class="card"><h2>Items</h2><div class="slots">${S.items.map((id,i)=>{const it=ITEMS.find(x=>x.id===id);
+    return `<div class="slot ${picker==='item'&&slotIdx===i?'act':''}" data-slot="${i}">${it?`<img title="${esc(it.name)}" src="${CD}cdn/${V}/img/item/${it.image.full}"><div class="x" data-rm="${i}">×</div>`:`<span>${i+1}</span>`}</div>`}).join('')}</div>`;
+  if(picker==='item'){
+    const maps={all:'All',11:'Summoner’s Rift',12:'ARAM',30:'Arena'};
+    h+=`<div class="row" style="margin-top:12px"><input id="iq" class="grow" placeholder="Search items" value="${esc(itemQ)}"><select id="mf">${Object.entries(maps).map(([k,v])=>`<option value="${k}" ${mapF==k?'selected':''}>${v}</option>`).join('')}</select></div><div class="grid">`+
+    ITEMS.filter(x=>x.name.toLowerCase().includes(itemQ.toLowerCase())&&(mapF==='all'||x.maps[mapF])).slice(0,300).map(x=>`<img class="ic" title="${esc(x.name)} (${x.gold.total}g)" data-item="${x.id}" src="${CD}cdn/${V}/img/item/${x.image.full}">`).join('')+`</div>`}
+  h+=`</div>`;
+  const f=document.activeElement?.id,pos=document.activeElement?.selectionStart;
+  $('#app').innerHTML=h;
+  if(f&&$('#'+f)&&['cq','iq','name'].includes(f)){$('#'+f).focus();try{$('#'+f).setSelectionRange(pos,pos)}catch{}}
+}
+document.addEventListener('click',e=>{
+  const t=e.target,d=n=>t.closest(`[data-${n}]`)?.dataset[n];
+  if(t.id==='chg'){picker=picker==='champ'?null:'champ';return render()}
+  if(t.id==='save'){S.name=$('#name').value||'Untitled';const a=load(),i=a.findIndex(b=>b.id===S.id);
+    if(!S.id)S.id=Date.now();if(i>=0)a[i]=S;else a.push(S);S=JSON.parse(JSON.stringify(S));store(a);return render()}
+  if(t.id==='new'){S=blank();D=null;picker=null;return render()}
+  let v;
+  if((v=d('load'))!==undefined){S=JSON.parse(JSON.stringify(load()[v]));D=null;picker=null;render();if(S.champ)fetch(`${CD}cdn/${V}/data/en_US/champion/${S.champ}.json`).then(r=>r.json()).then(j=>{D=j.data[S.champ];render()});return}
+  if((v=d('del'))!==undefined){const a=load();a.splice(v,1);store(a);return render()}
+  if((v=d('champ'))){picker=null;return pickChamp(v)}
+  if((v=d('sk'))){const[i,k]=v.split(',');if(canSet(+i,k))setSkill(+i,k);return}
+  if((v=d('pri')))return setPri(+v);
+  if((v=d('pr'))){const[si,id]=v.split(',').map(Number);if(si===0)S.ks=id;else S.p[si-1]=id;return render()}
+  if((v=d('sec')))return setSec(+v);
+  if((v=d('sr'))){const[si,id]=v.split(',').map(Number);return pickSec(si,{id})}
+  if((v=d('rm'))!==undefined){S.items[+v]=null;return render()}
+  if((v=d('slot'))!==undefined){slotIdx=+v;picker='item';return render()}
+  if((v=d('item'))){S.items[slotIdx]=v;const n=S.items.findIndex(x=>!x);if(n>=0)slotIdx=n;return render()}
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='cq'){champQ=e.target.value;render()}
+  if(e.target.id==='iq'){itemQ=e.target.value;render()}
+  if(e.target.id==='name')S.name=e.target.value;
+});
+document.addEventListener('change',e=>{if(e.target.id==='mf'){mapF=e.target.value;render()}});
+init();
+</script></body></html>
