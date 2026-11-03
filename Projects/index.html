@@ -34,7 +34,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at center, transparent 2px, #2a2a2a 2px),
                 linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #3a3a3a 100%);
             background-size: 8px 8px, 100% 100%;
@@ -50,7 +50,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(ellipse at top, rgba(70, 70, 70, 0.1) 0%, transparent 50%),
                 radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.3) 0%, transparent 50%);
             z-index: -1;
@@ -67,7 +67,7 @@
             justify-content: center;
             background: linear-gradient(145deg, #353535, #1f1f1f);
             border-radius: 50%;
-            box-shadow: 
+            box-shadow:
                 inset 0 4px 8px rgba(0, 0, 0, 0.6),
                 0 8px 16px rgba(0, 0, 0, 0.4),
                 0 0 30px rgba(100, 149, 237, 0.2);
@@ -130,7 +130,7 @@
             color: #c0c0c0;
             cursor: pointer;
             border-radius: 12px;
-            box-shadow: 
+            box-shadow:
                 0 8px 16px rgba(0, 0, 0, 0.5),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1),
                 inset 0 -2px 8px rgba(0, 0, 0, 0.3);
@@ -140,7 +140,7 @@
             text-transform: uppercase;
             letter-spacing: 3px;
             border: 2px solid #404040;
-            text-shadow: 
+            text-shadow:
                 0 2px 4px rgba(0, 0, 0, 0.8),
                 0 0 10px rgba(100, 149, 237, 0.3);
             display: flex;
@@ -188,7 +188,7 @@
             font-size: 3rem;
             font-weight: 900;
             color: white;
-            text-shadow: 
+            text-shadow:
                 3px 3px 0 #000,
                 -1px -1px 0 #000,
                 1px -1px 0 #000,
@@ -256,6 +256,37 @@
             font-family: 'Black Ops One', cursive;
         }
 
+        /* LoL Build Creator button styles */
+        .lol-button {
+            background: linear-gradient(135deg, #0a1428 0%, #0a323c 100%);
+        }
+
+        .lol-icon {
+            width: 120px;
+            height: 100px;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))
+                    drop-shadow(0 0 10px rgba(10, 200, 185, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .lol-button:hover .lol-icon {
+            transform: scale(1.08) rotate(-4deg);
+        }
+
+        .lol-text {
+            font-size: 1.8rem;
+            font-weight: 900;
+            font-family: 'Black Ops One', cursive;
+            color: #f0e6d2;
+            text-shadow:
+                3px 3px 0 #000,
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                0 0 20px rgba(200, 170, 110, 0.6);
+        }
+
         /* Blank button */
         .blank-button {
             background: linear-gradient(145deg, #3a3a3a, #252525);
@@ -277,7 +308,7 @@
 
         .nav-button:hover {
             transform: translateY(-4px);
-            box-shadow: 
+            box-shadow:
                 0 12px 24px rgba(0, 0, 0, 0.6),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2),
                 0 0 30px rgba(100, 149, 237, 0.5),
@@ -285,15 +316,28 @@
             border-color: #6495ED;
             color: #ffffff;
             background: linear-gradient(145deg, #454545, #2f2f2f);
-            text-shadow: 
+            text-shadow:
                 0 2px 4px rgba(0, 0, 0, 0.8),
                 0 0 20px rgba(100, 149, 237, 0.8),
                 0 0 30px rgba(100, 149, 237, 0.5);
         }
 
+        /* Keep each themed button's own background on hover */
+        .yahtzee-button:hover {
+            background: linear-gradient(135deg, #ff1a1a 0%, #d90000 100%);
+        }
+
+        .npa-button:hover {
+            background: linear-gradient(135deg, #ffffff 0%, #ececec 100%);
+        }
+
+        .lol-button:hover {
+            background: linear-gradient(135deg, #0d1c36 0%, #0d4150 100%);
+        }
+
         .nav-button:active {
             transform: translateY(-2px);
-            box-shadow: 
+            box-shadow:
                 0 6px 12px rgba(0, 0, 0, 0.5),
                 inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
@@ -324,6 +368,15 @@
                 font-size: 1.3rem;
             }
 
+            .lol-text {
+                font-size: 1.3rem;
+            }
+
+            .lol-icon {
+                width: 90px;
+                height: 75px;
+            }
+
             .dice {
                 width: 35px;
                 height: 35px;
@@ -350,78 +403,12 @@
             }
         }
 
-        .lol-button {
-    background: linear-gradient(135deg, #0a1428 0%, #091428 50%, #0a323c 100%);
-    border: 2px solid #c8aa6e;
-    border-radius: 6px;
-    padding: 14px 20px;
-    cursor: pointer;
-    color: #f0e6d2;
-    font-family: 'Georgia', serif;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    box-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
-}
-
-.lol-button:hover {
-    transform: translateY(-3px);
-    border-color: #0ac8b9;
-    box-shadow: 0 0 16px rgba(10, 200, 185, 0.6);
-}
-
-.lol-button:active {
-    transform: translateY(0);
-}
-
-.lol-button .button-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Emblem (replaces the flag) */
-.lol-button .hex-emblem {
-    display: flex;
-    width: 54px;
-    height: 36px;
-    border: 1px solid #c8aa6e;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.lol-button .hex-side {
-    width: 12px;
-    background: linear-gradient(180deg, #c8aa6e, #785a28);
-}
-
-.lol-button .hex-center {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #0a1428;
-}
-
-.lol-button .sword-icon {
-    font-size: 18px;
-}
-
-.lol-button .shield-icon {
-    font-size: 26px;
-    filter: drop-shadow(0 0 4px rgba(10, 200, 185, 0.7));
-}
-
-.lol-button .lol-text {
-    font-weight: bold;
-    font-size: 13px;
-    line-height: 1.3;
-    letter-spacing: 1.5px;
-    text-align: left;
-    color: #f0e6d2;
-}
-
-.lol-button:hover .lol-text {
-    color: #0ac8b9;
-}
+        @media (prefers-reduced-motion: reduce) {
+            .nav-button,
+            .lol-icon {
+                transition: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -462,21 +449,46 @@
         </button>
 
         <!-- LoL Build Creator Button -->
-<button class="nav-button lol-button" onclick="location.href='/Projects/lol_build_creator.html'">
-    <div class="button-content">
-        <div class="hex-emblem">
-            <div class="hex-side left"></div>
-            <div class="hex-center">
-                <div class="sword-icon">⚔️</div>
-            </div>
-            <div class="hex-side right"></div>
-        </div>
-        <div class="shield-icon">🛡️</div>
-        <div class="lol-text">LEAGUE BUILD<br>CREATOR</div>
-    </div>
-</button>
+        <button class="nav-button lol-button" onclick="location.href='/Projects/lol_build_creator.html'">
+            <div class="button-content">
+                <svg class="lol-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="lolGold" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#f0e6d2"/>
+                            <stop offset="50%" stop-color="#c8aa6e"/>
+                            <stop offset="100%" stop-color="#785a28"/>
+                        </linearGradient>
+                        <linearGradient id="lolBlade" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#9aa5ad"/>
+                            <stop offset="50%" stop-color="#ffffff"/>
+                            <stop offset="100%" stop-color="#9aa5ad"/>
+                        </linearGradient>
+                        <!-- One sword, reused twice -->
+                        <g id="lolSword">
+                            <polygon points="50,10 56,22 56,60 44,60 44,22" fill="url(#lolBlade)" stroke="#0a1428" stroke-width="1.5" stroke-linejoin="round"/>
+                            <line x1="50" y1="20" x2="50" y2="58" stroke="#6b767e" stroke-width="1.5"/>
+                            <rect x="34" y="60" width="32" height="7" rx="2" fill="url(#lolGold)" stroke="#0a1428" stroke-width="1.5"/>
+                            <rect x="46.5" y="67" width="7" height="14" fill="#785a28" stroke="#0a1428" stroke-width="1.5"/>
+                            <circle cx="50" cy="85" r="5" fill="url(#lolGold)" stroke="#0a1428" stroke-width="1.5"/>
+                        </g>
+                    </defs>
 
-     <!-- Blank Button -->
+                    <!-- Hextech hexagon frame -->
+                    <polygon points="50,3 91,26.5 91,73.5 50,97 9,73.5 9,26.5" fill="#0a1428" stroke="url(#lolGold)" stroke-width="4" stroke-linejoin="round"/>
+                    <polygon points="50,11 84,30.5 84,69.5 50,89 16,69.5 16,30.5" fill="none" stroke="#0ac8b9" stroke-width="1.5" opacity="0.8"/>
+
+                    <!-- Crossed swords -->
+                    <g transform="translate(50 50) rotate(45) scale(0.88) translate(-50 -50)"><use href="#lolSword"/></g>
+                    <g transform="translate(50 50) rotate(-45) scale(0.88) translate(-50 -50)"><use href="#lolSword"/></g>
+
+                    <!-- Center gem -->
+                    <polygon points="50,42 57,50 50,58 43,50" fill="#0ac8b9" stroke="#0a1428" stroke-width="1.5"/>
+                </svg>
+                <div class="lol-text">LOL BUILD<br>CREATOR</div>
+            </div>
+        </button>
+
+        <!-- Blank Button -->
         <button class="nav-button blank-button" onclick="location.href='#blank'">
             <div class="button-content">
             </div>
