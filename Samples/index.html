@@ -19,7 +19,7 @@ table{width:100%;border-collapse:collapse;font-size:.9rem}td,th{text-align:left;
 .ok{color:var(--ok)}.row{overflow-x:auto}
 </style></head><body><main>
 <h1>Free Sample Finder</h1>
-<p class="mute">Free samples and freebies in Canada, refreshed every 6 hours. <span id="upd"></span></p>
+<p class="mute">Free samples and freebies in Canada. Press the search button to pull the latest.</p>
 
 <details id="prof"><summary><b>1. Your details</b> (saved only in this browser)</summary>
 <div class="grid" id="pf" style="margin-top:10px"></div>
@@ -29,7 +29,7 @@ table{width:100%;border-collapse:collapse;font-size:.9rem}td,th{text-align:left;
 <p class="mute">3. Click <b>Get sample</b> on an item. The form opens in a new window. Click the bookmark there. It fills the form, reports back, and logs when you submit. You review and press submit yourself; consent boxes are never ticked for you.</p></details>
 
 <h2>Free samples</h2>
-<input id="q" type="search" placeholder="Search samples or sources" style="width:100%">
+<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="q" type="search" placeholder="Filter samples or sources" style="flex:1;min-width:180px"><button class="p" id="go">Search for samples now</button></div><p id="st" class="mute"></p>
 <div id="list"></div>
 
 <h2>Application history</h2>
@@ -48,6 +48,23 @@ const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>(
 const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
 const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let samples=[],P=ld("fs_profile",{}),H=ld("fs_hist",[]),L=ld("fs_learn",{});const wins={};
+
+const FEEDS={"Canadian Freebies":"https://www.canadianfreebies.ca/feed/","Freebies Canada":"https://freebiescanada.ca/feed/"};
+const PROXIES=[u=>"https://api.allorigins.win/raw?url="+encodeURIComponent(u),u=>"https://corsproxy.io/?url="+encodeURIComponent(u)];
+const WANT=/free|sample/i,SKIP=/contest|giveaway|sweepstake|\bwin\b|expired|ended/i;
+const merge=(a,b)=>[...new Map([...a,...b].map(i=>[i.id,i])).values()].sort((x,y)=>(Date.parse(y.date)||0)-(Date.parse(x.date)||0));
+async function getXml(url){for(const p of PROXIES){try{const r=await fetch(p(url));if(!r.ok)continue;const x=new DOMParser().parseFromString(await r.text(),"text/xml");if(x.querySelector("item"))return x}catch(e){}}return null}
+function parse(src,x){return[...x.querySelectorAll("item")].map(it=>{
+ const g=t=>(it.getElementsByTagName(t)[0]||{}).textContent||"",title=g("title").trim(),link=g("link").trim(),body=g("content:encoded")||g("description");
+ const doc=new DOMParser().parseFromString(body,"text/html"),host=link?new URL(link).host:"";
+ const ext=[...doc.querySelectorAll("a[href^=http]")].map(a=>a.href).find(h=>new URL(h).host!=host&&!/facebook|twitter|pinterest|instagram|wp\.com/.test(h));
+ return{id:link,title,source:src,url:link,form:ext||link,summary:doc.body.textContent.replace(/\s+/g," ").trim().slice(0,220),date:g("pubDate")}
+ }).filter(i=>i.id&&WANT.test(i.title)&&!SKIP.test(i.title))}
+async function live(){const b=$("#go");b.disabled=true;b.textContent="Searching...";$("#st").textContent="";const bad=[];
+ const res=await Promise.all(Object.entries(FEEDS).map(async([s,u])=>{const x=await getXml(u);if(!x){bad.push(s);return[]}try{return parse(s,x)}catch(e){bad.push(s);return[]}}));
+ const found=res.flat();samples=merge(samples,found);sv("fs_cache",samples.slice(0,300));list();
+ $("#st").textContent="Found "+found.length+" samples from "+(Object.keys(FEEDS).length-bad.length)+" sources."+(bad.length?" Could not reach: "+bad.join(", ")+". Try again in a minute.":"");
+ b.disabled=false;b.textContent="Search for samples now"}
 
 /* Runs on the sample site (as a bookmarklet), not on this page. */
 function filler(P){
@@ -76,7 +93,7 @@ function bookmark(){$("#bm").href="javascript:("+encodeURIComponent(filler.toStr
 $("#save").onclick=()=>{document.querySelectorAll("#pf [data-k]").forEach(e=>P[e.dataset.k]=e.value.trim());P.provName=PROV[P.prov];sv("fs_profile",P);bookmark();alert("Saved. Drag the bookmark again if you have an old copy.")};
 
 function list(){const q=$("#q").value.toLowerCase();const hit=samples.filter(s=>(s.title+s.source).toLowerCase().includes(q));
- $("#list").innerHTML=hit.map(s=>`<div class="card"><div><b>${esc(s.title)}</b><span class="mute">${esc(s.source)} - ${esc(s.summary)}</span></div><button class="p" data-id="${esc(s.id)}">Get sample</button></div>`).join("")||'<p class="mute">No samples yet. Run the "Update samples" workflow in your repo\'s Actions tab.</p>'}
+ $("#list").innerHTML=hit.map(s=>`<div class="card"><div><b>${esc(s.title)}</b><span class="mute">${esc(s.source)} - ${esc(s.summary)}</span></div><button class="p" data-id="${esc(s.id)}">Get sample</button></div>`).join("")||'<p class="mute">No samples yet. Press "Search for samples now".</p>'}
 $("#list").onclick=e=>{const id=e.target.dataset.id;if(!id)return;const s=samples.find(x=>x.id==id),host=new URL(s.form).host,hid=Date.now()+"";
  const map={};Object.entries(L[host]||{}).forEach(([n,f])=>{if(f.k)map[n]=f.k});
  H.unshift({hid,title:s.title,source:s.source,host,url:s.form,time:new Date().toLocaleString(),status:"opened"});sv("fs_hist",H);
@@ -91,5 +108,6 @@ $("#learn").onchange=e=>{const t=e.target;L[t.dataset.h][t.dataset.n].k=t.value|
 $("#exp").onclick=()=>{const c="when,item,site,status\n"+H.map(h=>[h.time,h.title,h.host,h.status].map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(",")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([c],{type:"text/csv"}));a.download="sample-history.csv";a.click()};
 $("#clr").onclick=()=>{if(confirm("Clear all history?")){H=[];sv("fs_hist",H);hist()}};
 $("#q").oninput=list;profile();bookmark();hist();learn();
-fetch("data/samples.json",{cache:"no-cache"}).then(r=>r.json()).then(d=>{samples=d;list();$("#upd").textContent=d.length+" items"}).catch(list);
+samples=ld("fs_cache",[]);$("#go").onclick=live;
+fetch("data/samples.json",{cache:"no-cache"}).then(r=>r.json()).catch(()=>[]).then(d=>{samples=merge(samples,d);list();if(!samples.length)live()});
 </script></body></html>
