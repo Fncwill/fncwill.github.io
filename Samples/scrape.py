@@ -4,9 +4,10 @@ import json, re, html, urllib.request as U, xml.etree.ElementTree as ET
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
 
-FEEDS = {  # edit me: name -> feed URL (not live-tested, verify each one)
-    "Canadian Freebies": "https://www.canadianfreebies.ca/feed/",
-    "Freebies Canada": "https://freebiescanada.ca/feed/",
+FEEDS = {  # edit me: name -> feed URL
+    "smartcanucks.ca": "https://smartcanucks.ca/category/canadian-freebies-free-stuff-canada/feed/",
+    "hotcanadadeals.ca": "https://hotcanadadeals.ca/feed/",
+    "smartcanucks.ca (all)": "https://feeds2.feedburner.com/smartcanucks",
 }
 WANT = re.compile(r"free|sample", re.I)
 SKIP = re.compile(r"contest|giveaway|sweepstake|\bwin\b|expired|ended", re.I)
