@@ -25,9 +25,13 @@ img{display:block}.ic{width:44px;height:44px;border-radius:8px;border:2px solid 
 .tag{font-size:12px;color:var(--mu)}
 .runes{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:700px){.runes{grid-template-columns:1fr}}
 .rrow{display:flex;gap:6px;margin:8px 0}.trees{display:flex;gap:6px;margin-bottom:6px}
-.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.shards{margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)}
+.shgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:4px}@media(max-width:700px){.shgrid{grid-template-columns:1fr;gap:6px}}
+.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:start}@media(max-width:600px){.slots{grid-template-columns:repeat(3,1fr)}}
+.sw{cursor:pointer;min-width:0}
 .slot{aspect-ratio:1;border:1px dashed var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative}
 .slot img{width:100%;height:100%}.slot span{color:var(--mu);font-size:11px}.slot.act{border-color:var(--ac)}
+.iname{font-size:11px;line-height:1.25;text-align:center;margin-top:5px;min-height:2.5em;overflow:hidden;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .x{position:absolute;top:2px;right:2px;background:#000a;color:#fff;border-radius:50%;width:16px;height:16px;font-size:11px;text-align:center;line-height:16px}
 .saves{display:flex;flex-direction:column;gap:6px}.sv{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border:1px solid var(--bd);border-radius:8px}
 .sv img{width:28px;height:28px;border-radius:6px;display:inline-block;vertical-align:middle;margin-right:8px}
@@ -42,10 +46,26 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const KEY='lol-builds-v1';
 let V,CH={},ITEMS=[],TREES=[],D=null; // D = detailed current champion
 let S=blank(),picker=null,champQ='',itemQ='',mapF='all',slotIdx=0;
-function blank(){return{name:'',champ:null,skills:Array(18).fill(null),pri:null,ks:null,p:[null,null,null],sec:null,s:[],items:Array(6).fill(null)}}
+function blank(){return{name:'',champ:null,skills:Array(18).fill(null),pri:null,ks:null,p:[null,null,null],sec:null,s:[],sh:[null,null,null],items:Array(6).fill(null)}}
 const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||[]}catch{return[]}};
 const store=a=>{try{localStorage.setItem(KEY,JSON.stringify(a))}catch{alert('Could not save (storage unavailable).')}};
 const CD='https://ddragon.leagueoflegends.com/';
+// Stat shards aren't included in Data Dragon's runesReforged.json, so they're defined here.
+// One entry per rune-page row (Offense, Flex, Defense). Update if Riot changes the shards.
+const SHARDS=[
+  {row:'Offense',opts:[
+    {id:5008,name:'Adaptive Force',d:'+5.4 AD or +9 AP (adaptive)',icon:'StatModsAdaptiveForceIcon'},
+    {id:5005,name:'Attack Speed',d:'+10% attack speed',icon:'StatModsAttackSpeedIcon'},
+    {id:5007,name:'Ability Haste',d:'+8 ability haste',icon:'StatModsCDRScalingIcon'}]},
+  {row:'Flex',opts:[
+    {id:5008,name:'Adaptive Force',d:'+5.4 AD or +9 AP (adaptive)',icon:'StatModsAdaptiveForceIcon'},
+    {id:5010,name:'Move Speed',d:'+2.5% movement speed',icon:'StatModsMovementSpeedIcon'},
+    {id:5001,name:'Health Scaling',d:'+10–200 health (by level)',icon:'StatModsHealthScalingIcon'}]},
+  {row:'Defense',opts:[
+    {id:5011,name:'Health',d:'+65 health',icon:'StatModsHealthPlusIcon'},
+    {id:5013,name:'Tenacity and Slow Resist',d:'+10% tenacity and slow resist',icon:'StatModsTenacityIcon'},
+    {id:5001,name:'Health Scaling',d:'+10–200 health (by level)',icon:'StatModsHealthScalingIcon'}]}];
+const shimg=o=>`${CD}cdn/img/perk-images/StatMods/${o.icon}.png`;
 async function init(){
   try{
     V=(await (await fetch(CD+'api/versions.json')).json())[0];
@@ -127,10 +147,14 @@ function render(){
       return `<img class="ic ${si===0?'':'sm'} ${on?'on':'off'}" title="${esc(r.name)}" data-pr="${si},${r.id}" src="${rimg(r)}">`}).join('')}</div>`});
   h+=`</div><div><div class="tag">Secondary</div><div class="trees">${TREES.filter(t=>t.id!==S.pri).map(t=>`<img class="ic sm ${S.sec===t.id?'on':'off'}" title="${esc(t.name)}" data-sec="${t.id}" src="${rimg(t)}">`).join('')}</div>`;
   if(st)st.slots.forEach((sl,si)=>{if(si===0)return;h+=`<div class="rrow">${sl.runes.map(r=>`<img class="ic sm ${S.s.some(x=>x.id===r.id)?'on':'off'}" title="${esc(r.name)}" data-sr="${si},${r.id}" src="${rimg(r)}">`).join('')}</div>`});
-  h+=`<div class="tag">Pick any 2 from different rows</div></div></div></div>`;
+  h+=`<div class="tag">Pick any 2 from different rows</div></div></div>`;
+  // stat shards: offense, flex, defense
+  h+=`<div class="shards"><div class="tag">Stat shards</div><div class="shgrid">${SHARDS.map((g,ri)=>{
+    const cur=(S.sh||[])[ri],sel=g.opts.find(o=>o.id===cur);
+    return `<div><div class="tag">${g.row}${sel?` – ${esc(sel.name)}`:''}</div><div class="rrow">${g.opts.map(o=>`<img class="ic sm ${cur===o.id?'on':'off'}" title="${esc(o.name)} (${esc(o.d)})" data-sh="${ri},${o.id}" src="${shimg(o)}">`).join('')}</div></div>`}).join('')}</div></div></div>`;
   // items
   h+=`<div class="card"><h2>Items</h2><div class="slots">${S.items.map((id,i)=>{const it=ITEMS.find(x=>x.id===id);
-    return `<div class="slot ${picker==='item'&&slotIdx===i?'act':''}" data-slot="${i}">${it?`<img title="${esc(it.name)}" src="${CD}cdn/${V}/img/item/${it.image.full}"><div class="x" data-rm="${i}">×</div>`:`<span>${i+1}</span>`}</div>`}).join('')}</div>`;
+    return `<div class="sw" data-slot="${i}"><div class="slot ${picker==='item'&&slotIdx===i?'act':''}">${it?`<img title="${esc(it.name)}" src="${CD}cdn/${V}/img/item/${it.image.full}"><div class="x" data-rm="${i}">×</div>`:`<span>${i+1}</span>`}</div><div class="iname"${it?` title="${esc(it.name)}"`:''}>${it?esc(it.name):''}</div></div>`}).join('')}</div>`;
   if(picker==='item'){
     const maps={all:'All',11:'Summoner’s Rift',12:'ARAM',30:'Arena'};
     h+=`<div class="row" style="margin-top:12px"><input id="iq" class="grow" placeholder="Search items" value="${esc(itemQ)}"><select id="mf">${Object.entries(maps).map(([k,v])=>`<option value="${k}" ${mapF==k?'selected':''}>${v}</option>`).join('')}</select></div><div class="grid">`+
@@ -147,7 +171,7 @@ document.addEventListener('click',e=>{
     if(!S.id)S.id=Date.now();if(i>=0)a[i]=S;else a.push(S);S=JSON.parse(JSON.stringify(S));store(a);return render()}
   if(t.id==='new'){S=blank();D=null;picker=null;return render()}
   let v;
-  if((v=d('load'))!==undefined){S=JSON.parse(JSON.stringify(load()[v]));D=null;picker=null;render();if(S.champ)fetch(`${CD}cdn/${V}/data/en_US/champion/${S.champ}.json`).then(r=>r.json()).then(j=>{D=j.data[S.champ];render()});return}
+  if((v=d('load'))!==undefined){S=Object.assign(blank(),JSON.parse(JSON.stringify(load()[v])));D=null;picker=null;render();if(S.champ)fetch(`${CD}cdn/${V}/data/en_US/champion/${S.champ}.json`).then(r=>r.json()).then(j=>{D=j.data[S.champ];render()});return}
   if((v=d('del'))!==undefined){const a=load();a.splice(v,1);store(a);return render()}
   if((v=d('champ'))){picker=null;return pickChamp(v)}
   if((v=d('sk'))){const[i,k]=v.split(',');if(canSet(+i,k))setSkill(+i,k);return}
@@ -155,6 +179,7 @@ document.addEventListener('click',e=>{
   if((v=d('pr'))){const[si,id]=v.split(',').map(Number);if(si===0)S.ks=id;else S.p[si-1]=id;return render()}
   if((v=d('sec')))return setSec(+v);
   if((v=d('sr'))){const[si,id]=v.split(',').map(Number);return pickSec(si,{id})}
+  if((v=d('sh'))){const[ri,id]=v.split(',').map(Number);S.sh=S.sh||[null,null,null];S.sh[ri]=S.sh[ri]===id?null:id;return render()}
   if((v=d('rm'))!==undefined){S.items[+v]=null;return render()}
   if((v=d('slot'))!==undefined){slotIdx=+v;picker='item';return render()}
   if((v=d('item'))){S.items[slotIdx]=v;const n=S.items.findIndex(x=>!x);if(n>=0)slotIdx=n;return render()}
